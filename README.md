@@ -7,3 +7,11 @@ Actually, this is just a collection of methods for analyzing the game.
 
 Online version: http://www.chiark.greenend.org.uk/~sgtatham/puzzles/java/guess.html
 
+Usage
+-----
+
+Execute ```python guess.py```.
+
+This will show the optimal game for six colors and four places -- the "best" guess
+(= reduces the number of possible solutions the most) is answered with the "best"
+evaluation (= keeps the number of possible solutions maximized).
