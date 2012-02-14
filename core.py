@@ -3,31 +3,22 @@ import itertools
 import unittest
 import tools
 
-@tools.memoize
-def blackWhite(places):
 
-	result = []
+## core methods ###############################################################
 
-	for b in range(places+1):
-		for w in range(places+1):
-			if b+w <= places:
-				result += [(b,w)]
+def reduceSolutionSet(guess, evaluation, solutionSet):
+	'''Returns the (reduced) set of candidate solutions if the specified guess
+	is evaluated as specified'''
+	return [s for s in solutionSet if match(guess, evaluation, s)]
 
-	return result
-
-def maxRemainingSolutions(solutionSet, guess, places):
-
-	remaining = 0
-
-	# try all combinations of black and white evaluation
-	for evaluation in blackWhite(places):
-		r = len(reduceSolutionSet(guess, evaluation, solutionSet))
-		if r > remaining:
-			remaining = r
-
-	return remaining
+def getSolutionSet(places, colors):
+	'''Returns the list of all possible solutions with the specified number
+	of places and colors'''
+	return list(itertools.product(range(colors), repeat=places))
 
 def bestGuess(solutionSet, places):
+	'''Returns the (first) guess that reduces the number of possible solutions
+	the most.'''
 
 	bestGuess = solutionSet[0]
 	remaining = len(solutionSet)+1
@@ -46,6 +37,7 @@ def bestGuess(solutionSet, places):
 	return bestGuess
 
 def bestEvaluation(solutionSet, guess, places):
+	'''Returns the evaluation for guess that "keeps" the most possible solutions.'''
 
 	result = (0,0)
 
@@ -60,30 +52,8 @@ def bestEvaluation(solutionSet, guess, places):
 
 	return result
 
-def probability(solutionSet, place, color):
-	count = len([s for s in solutionSet if s[place] == color])
-	return float(count) / len(solutionSet)
 
-def printProbabilities(solutionSet, places, colors):
-	for c in range(colors):
-		print c
-		for p in range(places):
-			print ' %f' % probability(solutionSet, p, c)
-
-def printEvaluationOverview(solutionSet, guess, places):
-	for b in range(places+1):
-		for w in range(places+1):
-			if b+w <= places:
-				print '%dB %dW -- %d' % (b, w, len(reduceSolutionSet(guess, (b, w), solutionSet)))
-
-def match(guess, evaluation, solution):
-	return evaluation == evaluate(guess, solution)
-
-def reduceSolutionSet(guess, evaluation, solutionSet):
-	return [s for s in solutionSet if match(guess, evaluation, s)]
-
-def getSolutionSet(places, colors):
-	return list(itertools.product(range(colors), repeat=places))
+## evaluation method ##########################################################
 
 @tools.memoize
 def evaluate(guess, solution):
@@ -133,6 +103,41 @@ class TestEvaluateMethod(unittest.TestCase):
 	def test_2B_0W(self):
 		self.assertEqual((2,0), evaluate((1,0), (1,0)))
 
+
+## misc. utility methods ######################################################
+
+@tools.memoize
+def blackWhite(places):
+	'''Returns all possible evaluation results -- all possible combinations
+	of white and black with #white+#black < places'''
+
+	result = []
+
+	for b in range(places+1):
+		for w in range(places+1):
+			if b+w <= places:
+				result += [(b,w)]
+
+	return result
+
+def maxRemainingSolutions(solutionSet, guess, places):
+
+	remaining = 0
+
+	# try all combinations of black and white evaluation
+	for evaluation in blackWhite(places):
+		r = len(reduceSolutionSet(guess, evaluation, solutionSet))
+		if r > remaining:
+			remaining = r
+
+	return remaining
+
+def match(guess, evaluation, solution):
+	'''Returns whether the evaluation matches the guess for the specified solution'''
+	return evaluation == evaluate(guess, solution)
+
+
+## main method to execute unittests ###########################################
 
 if __name__ == '__main__':
 	unittest.main()

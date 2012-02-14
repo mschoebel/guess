@@ -17,38 +17,20 @@ def main():
 	print 'Best initial guess             : %s' % str(guess)
 
 	print
-	print 'Worst case game'
+	print 'Optimal game'
 
-	core.printEvaluationOverview(allCombinations, guess, PLACES)
 	evaluation = core.bestEvaluation(allCombinations, guess, PLACES)
 	remaining = core.reduceSolutionSet(guess, (0,0), allCombinations)
 
-	print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
+	while (evaluation != (4,0)):
 
+		print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
 
-	guess = core.bestGuess(remaining, PLACES)
-	evaluation = core.bestEvaluation(remaining, guess, PLACES)
-	remaining = core.reduceSolutionSet(guess, evaluation, remaining)
+		guess = core.bestGuess(remaining, PLACES)
+		evaluation = core.bestEvaluation(remaining, guess, PLACES)
+		remaining = core.reduceSolutionSet(guess, evaluation, remaining)
 
-	print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
-
-	guess = core.bestGuess(remaining, PLACES)
-	evaluation = core.bestEvaluation(remaining, guess, PLACES)
-	remaining = core.reduceSolutionSet(guess, evaluation, remaining)
-
-	print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
-
-	guess = core.bestGuess(remaining, PLACES)
-	evaluation = core.bestEvaluation(remaining, guess, PLACES)
-	remaining = core.reduceSolutionSet(guess, evaluation, remaining)
-
-	print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
-
-	guess = core.bestGuess(remaining, PLACES)
-	evaluation = core.bestEvaluation(remaining, guess, PLACES)
-	remaining = core.reduceSolutionSet(guess, evaluation, remaining)
-
-	print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
+	print '%s %s' % (guess, evaluation)
 
 
 if __name__ == '__main__':
