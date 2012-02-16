@@ -11,7 +11,8 @@ def main():
 
 	print 'Overall number of combinations : %d' % len(allCombinations)
 
-	guess = core.bestGuess(allCombinations, PLACES)
+	guess = core.bestFirstGuess(PLACES, COLORS)
+	#guess = core.bestGuess(allCombinations, PLACES)
 	#guess = (0,0,1,1) # C6 P4
 
 	print 'Best initial guess             : %s' % str(guess)
@@ -20,9 +21,9 @@ def main():
 	print 'Optimal game'
 
 	evaluation = core.bestEvaluation(allCombinations, guess, PLACES)
-	remaining = core.reduceSolutionSet(guess, (0,0), allCombinations)
+	remaining = core.reduceSolutionSet(guess, evaluation, allCombinations)
 
-	while (evaluation != (4,0)):
+	while (evaluation != (PLACES,0)):
 
 		print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
 
@@ -32,6 +33,4 @@ def main():
 
 	print '%s %s' % (guess, evaluation)
 
-
-if __name__ == '__main__':
-	main()
+main()

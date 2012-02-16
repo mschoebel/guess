@@ -16,23 +16,46 @@ def getSolutionSet(places, colors):
 	of places and colors'''
 	return list(itertools.product(range(colors), repeat=places))
 
-def bestGuess(solutionSet, places):
-	'''Returns the (first) guess that reduces the number of possible solutions
-	the most.'''
+def bestFirstGuess(places, colors):
+	'''Returns the (first) guess that reduces the initial number of possible
+	solutions the most. Optimizes the set of checked initial guesses.'''
 
-	bestGuess = solutionSet[0]
+	# get all solutions for the specified number of places and colors
+	completeSolutionSet = getSolutionSet(places, colors)
+
+	# determine reduced candidate set for first guess
+	optimizedCandidateSet = []
+	for guess in itertools.combinations_with_replacement(range(places), places):
+		# guess is starting with '0'?
+		if guess[0] != 0:
+			continue
+		# guess is monoton increasing, without "holes"?
+		for i in range(len(guess)-1):
+			if guess[i+1] - guess[i] > 1:
+				guess = ()
+				break
+		# valid first guess?
+		if guess != ():
+			optimizedCandidateSet.append(guess)
+
+	return bestGuess(completeSolutionSet, places, optimizedCandidateSet)
+
+def bestGuess(solutionSet, places, candidateSet = []):
+	'''Returns the (first) guess from the candidateSet that reduces the number
+	of possible solutions the most. If no candidateSet is given, all possible
+	solutions are considered as candidates.'''
+
+	if len(candidateSet) == 0:
+		candidateSet = solutionSet
+
+	bestGuess = candidateSet[0]
 	remaining = len(solutionSet)+1
 
-	i = 0
-
-	for guess in solutionSet:
-
+	for guess in candidateSet:
 	 	r = maxRemainingSolutions(solutionSet, guess, places)
 	 	if r < remaining:
 	 		bestGuess = guess
 	 		remaining = r
-
-		i += 1
 
 	return bestGuess
 
@@ -58,6 +81,9 @@ def bestEvaluation(solutionSet, guess, places):
 @tools.memoize
 def evaluate(guess, solution):
 	'''Returns the evaluation result of the specified guess compared to the solution.'''
+
+	if guess == solution:
+		return (len(guess), 0)
 
 	tmpSolution = list(solution)
 
@@ -109,7 +135,7 @@ class TestEvaluateMethod(unittest.TestCase):
 @tools.memoize
 def blackWhite(places):
 	'''Returns all possible evaluation results -- all possible combinations
-	of white and black with #white+#black < places'''
+	of white and black with #white+#black <= places'''
 
 	result = []
 
