@@ -20,4 +20,5 @@ Links
 -----
 
 Online version: http://www.chiark.greenend.org.uk/~sgtatham/puzzles/java/guess.html
+
 Analysis: http://mathworld.wolfram.com/Mastermind.html
