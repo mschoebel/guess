@@ -82,33 +82,17 @@ def bestEvaluation(solutionSet, guess, places):
 def evaluate(guess, solution):
 	'''Returns the evaluation result of the specified guess compared to the solution.'''
 
-	if guess == solution:
-		return (len(guess), 0)
-
-	tmpSolution = list(solution)
-
+	# determine 'black' == number of correct colors at the right position
 	black = 0
-	white = 0
-
-	# check every position of guessed combination ..
 	for i in range(len(guess)):
-		if guess[i] == tmpSolution[i]:
-			# .. found exact match -> black!
+		if guess[i] == solution[i]:
 			black += 1
-			tmpSolution[i] = -1
-		else:
-			# .. look for guessed color on another position
-			for j in range(len(guess)):
-				if i != j and guess[i] == tmpSolution[j] and guess[j] != tmpSolution[j]:
-					white += 1
-					tmpSolution[j] = -1
-					break
 
-		# loop invariant
-		assert black+white <= i+1
-
-	# final consistency check
-	assert black+white <= len(guess)
+	# determine 'white' == number of correct colors	at the wrong position
+	# see: http://mathworld.wolfram.com/Mastermind.html
+	white = -black
+	for c in set(guess):
+		white += min(guess.count(c), solution.count(c))
 
 	return (black, white)
 
@@ -116,19 +100,22 @@ class TestEvaluateMethod(unittest.TestCase):
 
 	def test_no_match(self):
 		self.assertEqual((0,0), evaluate((0,0), (1,1)))
+		self.assertEqual((0,0), evaluate((1,1), (0,0)))
 
 	def test_0B_1W(self):
 		self.assertEqual((0,1), evaluate((1,0), (2,1)))
+		self.assertEqual((0,1), evaluate((2,1), (1,0)))
 
 	def test_0B_2W(self):
 		self.assertEqual((0,2), evaluate((1,0), (0,1)))
+		self.assertEqual((0,2), evaluate((0,1), (1,0)))
 
 	def test_1B_0W(self):
 		self.assertEqual((1,0), evaluate((1,0), (1,1)))
+		self.assertEqual((1,0), evaluate((1,1), (1,0)))
 
 	def test_2B_0W(self):
 		self.assertEqual((2,0), evaluate((1,0), (1,0)))
-
 
 ## misc. utility methods ######################################################
 

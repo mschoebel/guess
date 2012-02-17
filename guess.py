@@ -20,17 +20,21 @@ def main():
 	print
 	print 'Optimal game'
 
+	nr = 1
+
 	evaluation = core.bestEvaluation(allCombinations, guess, PLACES)
 	remaining = core.reduceSolutionSet(guess, evaluation, allCombinations)
 
 	while (evaluation != (PLACES,0)):
 
-		print '%s %s - %d solutions remaining' % (guess, evaluation, len(remaining))
+		print '%2d: %s %s - %d solutions remaining' % (nr, guess, evaluation, len(remaining))
 
 		guess = core.bestGuess(remaining, PLACES)
 		evaluation = core.bestEvaluation(remaining, guess, PLACES)
 		remaining = core.reduceSolutionSet(guess, evaluation, remaining)
 
-	print '%s %s' % (guess, evaluation)
+		nr += 1
+
+	print '%2d: %s %s' % (nr, guess, evaluation)
 
 main()
