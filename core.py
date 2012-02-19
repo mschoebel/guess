@@ -121,17 +121,7 @@ class TestEvaluateMethod(unittest.TestCase):
 
 @tools.memoize
 def blackWhite(places):
-	'''Returns all possible evaluation results -- all possible combinations
-	of white and black with #white+#black <= places'''
-
-	result = []
-
-	for b in range(places+1):
-		for w in range(places+1):
-			if b+w <= places:
-				result += [(b,w)]
-
-	return result
+	return [(b,w) for b in range(places+1) for w in range(places+1) if b+w <= places]
 
 def maxRemainingSolutions(solutionSet, guess, places):
 
