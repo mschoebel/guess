@@ -4,6 +4,20 @@ import unittest
 import tools
 
 
+## game configuration #########################################################
+
+class GameConfiguration:
+	def __init__(self, places, colors):
+		self.places = places
+		self.colors = colors
+
+	def places(self):
+		return self.places
+
+	def colors(self):
+		return self.colors
+
+
 ## core methods ###############################################################
 
 def reduceSolutionSet(guess, evaluation, solutionSet):
@@ -11,21 +25,21 @@ def reduceSolutionSet(guess, evaluation, solutionSet):
 	is evaluated as specified'''
 	return [s for s in solutionSet if match(guess, evaluation, s)]
 
-def getSolutionSet(places, colors):
+def getSolutionSet(game):
 	'''Returns the list of all possible solutions with the specified number
 	of places and colors'''
-	return list(itertools.product(range(colors), repeat=places))
+	return list(itertools.product(range(game.colors), repeat=game.places))
 
-def bestFirstGuess(places, colors):
+def bestFirstGuess(game):
 	'''Returns the (first) guess that reduces the initial number of possible
 	solutions the most. Optimizes the set of checked initial guesses.'''
 
 	# get all solutions for the specified number of places and colors
-	completeSolutionSet = getSolutionSet(places, colors)
+	completeSolutionSet = getSolutionSet(game)
 
 	# determine reduced candidate set for first guess
 	optimizedCandidateSet = []
-	for guess in itertools.combinations_with_replacement(range(places), places):
+	for guess in itertools.combinations_with_replacement(range(game.places), game.places):
 		# guess is starting with '0'?
 		if guess[0] != 0:
 			continue
@@ -38,9 +52,9 @@ def bestFirstGuess(places, colors):
 		if guess != ():
 			optimizedCandidateSet.append(guess)
 
-	return bestGuess(completeSolutionSet, places, optimizedCandidateSet)
+	return bestGuess(game, completeSolutionSet, optimizedCandidateSet)
 
-def bestGuess(solutionSet, places, candidateSet = []):
+def bestGuess(game, solutionSet, candidateSet = []):
 	'''Returns the (first) guess from the candidateSet that reduces the number
 	of possible solutions the most. If no candidateSet is given, all possible
 	solutions are considered as candidates.'''
@@ -52,14 +66,14 @@ def bestGuess(solutionSet, places, candidateSet = []):
 	remaining = len(solutionSet)+1
 
 	for guess in candidateSet:
-	 	r = maxRemainingSolutions(solutionSet, guess, places)
+	 	r = maxRemainingSolutions(game, solutionSet, guess)
 	 	if r < remaining:
 	 		bestGuess = guess
 	 		remaining = r
 
 	return bestGuess
 
-def bestEvaluation(solutionSet, guess, places):
+def bestEvaluation(game, solutionSet, guess):
 	'''Returns the evaluation for guess that "keeps" the most possible solutions.'''
 
 	result = (0,0)
@@ -67,7 +81,7 @@ def bestEvaluation(solutionSet, guess, places):
 	remaining = -1
 
 	# try all combinations of black and white evaluation
-	for evaluation in blackWhite(places):
+	for evaluation in blackWhite(game):
 		r = len(reduceSolutionSet(guess, evaluation, solutionSet))
 		if r > remaining:
 			result = evaluation
@@ -120,18 +134,18 @@ class TestEvaluateMethod(unittest.TestCase):
 ## misc. utility methods ######################################################
 
 @tools.memoize
-def blackWhite(places):
+def blackWhite(game):
 	'''Returns all possible evaluation results -- all possible combinations
 	of white and black with #white+#black <= places'''
 
-	return [(b,w) for b in range(places+1) for w in range(places+1) if b+w <= places]
+	return [(b,w) for b in range(game.places+1) for w in range(game.places+1) if b+w <= game.places]
 
-def maxRemainingSolutions(solutionSet, guess, places):
+def maxRemainingSolutions(game, solutionSet, guess):
 
 	remaining = 0
 
 	# try all combinations of black and white evaluation
-	for evaluation in blackWhite(places):
+	for evaluation in blackWhite(game):
 		r = len(reduceSolutionSet(guess, evaluation, solutionSet))
 		if r > remaining:
 			remaining = r
