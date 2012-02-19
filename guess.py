@@ -28,7 +28,7 @@ def main():
 	evaluation = core.bestEvaluation(game, allCombinations, guess)
 	remaining = core.reduceSolutionSet(guess, evaluation, allCombinations)
 
-	while (evaluation != (PLACES,0)):
+	while (evaluation != (game.places,0)):
 
 		print '%2d: %s %s - %d solutions remaining' % (nr, guess, evaluation, len(remaining))
 
